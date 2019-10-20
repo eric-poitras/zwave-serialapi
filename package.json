@@ -21,7 +21,8 @@
     ],
     "exclude": [
       "**/*.spec.js"
-    ]
+    ],
+    "reporter": ["lcov", "text"]
   },
   "dependencies": {
     "debug": "^4.1.1",
