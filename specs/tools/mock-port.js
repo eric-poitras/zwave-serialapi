@@ -60,6 +60,9 @@ function setupMockPort (name) {
 
   function emitData (buf) {
     if (port) {
+      if (typeof buf === 'string') {
+        buf = Buffer.from(buf, 'hex')
+      }
       port.binding.emitData(buf)
     } else throw new Error(`Cannot send data on MockPort ${name}. It is not created.`)
     return wait(0)
