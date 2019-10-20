@@ -1,8 +1,0 @@
-{
-  valid: true,
-  marker: 1,
-  frame: <Buffer 01 2b 01 07 01 00 00 86 01 01 00 5a fe 81 ff 88 4f 1f 00 00 fb 9f 7d a0 67 00 00 80 00 80 86 00 00 00 e8 73 00 00 0e 00 00 60 00 00 fa>,
-  type: 1,
-  funcId: 7,
-  params: <Buffer 01 00 00 86 01 01 00 5a fe 81 ff 88 4f 1f 00 00 fb 9f 7d a0 67 00 00 80 00 80 86 00 00 00 e8 73 00 00 0e 00 00 60 00 00>
-}
