@@ -1,0 +1,11 @@
+#!/home/epoitras/.nvm/versions/node/v12.4.0/bin/node
+var SerialApi = require('./lib/serialapi')
+var myrepl = require('repl').start()
+const api = SerialApi({
+  port: '/dev/ttyACM2'
+})
+api.open()
+api.getInitData()
+
+myrepl.context.SerialApi = SerialApi
+myrepl.context.api = api

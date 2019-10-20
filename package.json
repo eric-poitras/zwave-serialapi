@@ -1,0 +1,38 @@
+{
+  "name": "zwaveapi",
+  "version": "0.0.1",
+  "description": "Low-level zwave api",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "mocha \"./specs/**/*.spec.js\"",
+    "coverage": "nyc npm run test"
+  },
+  "author": "Eric Poitras",
+  "license": "MIT",
+  "standard": {
+    "envs": [
+      "mocha"
+    ]
+  },
+  "nyc": {
+    "all": true,
+    "include": [
+      "lib/**/*.js"
+    ],
+    "exclude": [
+      "**/*.spec.js"
+    ]
+  },
+  "dependencies": {
+    "debug": "^4.1.1",
+    "serialport": "^7.1.5"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0",
+    "nyc": "^14.1.1",
+    "proxyquire": "^2.1.3",
+    "sinon": "^7.4.2",
+    "standard": "^14.3.1"
+  }
+}
