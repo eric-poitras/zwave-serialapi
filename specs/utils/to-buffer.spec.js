@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-const toBuffer = require('../../lib/serialapi/to-buffer')
+const toBuffer = require('../../lib/utils/to-buffer')
 const expect = require('chai').expect
 
 describe('toBuffer', function () {
@@ -8,7 +8,7 @@ describe('toBuffer', function () {
     expect(Buffer.isBuffer(res)).to.be.true
     expect(res.toString('hex')).to.equal('000102ffab')
   })
-  it('should convert array to buffer using the hex strategy', function () {
+  it('should convert array to buffer', function () {
     const res = toBuffer([0x10, 0xff, 0x12])
     expect(Buffer.isBuffer(res)).to.be.true
     expect(res.toString('hex')).to.equal('10ff12')

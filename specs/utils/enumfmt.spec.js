@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-const enumfmt = require('../../lib/serialapi/enumfmt')
+const enumfmt = require('../../lib/utils/enumfmt')
 const expect = require('chai').expect
 
 const testEnum1 = {
