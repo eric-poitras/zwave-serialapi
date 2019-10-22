@@ -10,10 +10,13 @@ function standardEncodeRequestSpecs (funcMeta, scenarios) {
       for (const scenarioName of Object.keys(scenarios.success)) {
         const scenario = scenarios.success[scenarioName]
         it(`should encode frame request correctly in scenario '${scenarioName}'`, function () {
-          const res = encodeRequest(scenario.request, scenario.callbackId)
-          expect(res.request).to.equal(scenario.request)
-          expect(res.funcId).to.equal(funcId)
-          expect(res.data).to.deep.equal(scenario.expected)
+          const actualResult = encodeRequest(scenario.request, scenario.callbackId)
+          const expectedResult = Object.assign({
+            funcId,
+            data: scenario.expected,
+            callbackId: scenario.callbackId
+          }, scenario.request)
+          expect(actualResult).to.deep.equal(expectedResult)
         })
       }
     }
@@ -36,12 +39,13 @@ function standardDecodeResponseSpecs (funcMeta, scenarios) {
               funcId,
               params: Buffer.from(scenario.data, 'hex')
             }
-            const res = decodeResponse(dataFrame)
-            expect(res).to.deep.equal({
+            const actualResult = decodeResponse(dataFrame)
+            const expectedResult = Object.assign({
               funcId,
               data: [...dataFrame.params],
-              response: scenario.expected
-            })
+              callbackId: scenario.callbackId
+            }, scenario.expected)
+            expect(actualResult).to.deep.equal(expectedResult)
           })
 
           it('should not decode response if type is request', function () {
@@ -70,12 +74,13 @@ function standardDecodeResponseSpecs (funcMeta, scenarios) {
               funcId,
               params: Buffer.from(scenario.data + '0000', 'hex')
             }
-            const res = decodeResponse(dataFrame)
-            expect(res).to.deep.equal({
+            const actualResult = decodeResponse(dataFrame)
+            const expectedResult = Object.assign({
               funcId,
               data: [...dataFrame.params],
-              response: scenario.expected
-            })
+              callbackId: scenario.callbackId
+            }, scenario.expected)
+            expect(actualResult).to.deep.equal(expectedResult)
           })
         })
       }
@@ -99,12 +104,13 @@ function standardDecodeCallbackSpecs (funcMeta, scenarios) {
               funcId,
               params: Buffer.from(scenario.data, 'hex')
             }
-            const res = decodeCallback(dataFrame, scenario.callbackId)
-            expect(res).to.deep.equal({
+            const actualResult = decodeCallback(dataFrame, scenario.callbackId)
+            const expectedResult = Object.assign({
               funcId,
               data: [...dataFrame.params],
-              callback: scenario.expected
-            })
+              callbackId: scenario.callbackId
+            }, scenario.expected)
+            expect(actualResult).to.deep.equal(expectedResult)
           })
 
           it('should not decode response if type is response', function () {
@@ -113,8 +119,8 @@ function standardDecodeCallbackSpecs (funcMeta, scenarios) {
               funcId,
               params: Buffer.from(scenario.data, 'hex')
             }
-            const res = decodeCallback(dataFrame, scenario.callbackId)
-            expect(res).to.be.undefined
+            const result = decodeCallback(dataFrame, scenario.callbackId)
+            expect(result).to.be.undefined
           })
 
           it('should not decode response if funcId is invalid', function () {
@@ -123,8 +129,8 @@ function standardDecodeCallbackSpecs (funcMeta, scenarios) {
               funcId: funcId - 1,
               params: Buffer.from(scenario.data, 'hex')
             }
-            const res = decodeCallback(dataFrame, scenario.callbackId)
-            expect(res).to.be.undefined
+            const result = decodeCallback(dataFrame, scenario.callbackId)
+            expect(result).to.be.undefined
           })
 
           it('should decode frame request correctly even with extra data', function () {
@@ -133,12 +139,13 @@ function standardDecodeCallbackSpecs (funcMeta, scenarios) {
               funcId,
               params: Buffer.from(scenario.data + '0000', 'hex')
             }
-            const res = decodeCallback(dataFrame, scenario.callbackId)
-            expect(res).to.deep.equal({
+            const actualResult = decodeCallback(dataFrame, scenario.callbackId)
+            const expectedResult = Object.assign({
               funcId,
               data: [...dataFrame.params],
-              callback: scenario.expected
-            })
+              callbackId: scenario.callbackId
+            }, scenario.expected)
+            expect(actualResult).to.deep.equal(expectedResult)
           })
         })
       }
