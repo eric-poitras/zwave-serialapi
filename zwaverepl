@@ -5,7 +5,6 @@ const api = SerialApi({
   port: '/dev/ttyACM2'
 })
 api.open()
-api.getInitData()
 
 myrepl.context.SerialApi = SerialApi
 myrepl.context.api = api

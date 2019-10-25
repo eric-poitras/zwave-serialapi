@@ -4,6 +4,17 @@ const proxyquire = require('proxyquire')
 const mockTime = require('../tools/mock-time')
 const sinon = require('sinon')
 
+function testRequestEncoder (funcId, data) {
+  data = data || []
+  return (request) => { return { funcId, data, request } }
+}
+
+function testResponseDecoder (response) {
+  return (frame, callbackId) => {
+    return { funcId: frame.funcId, params: frame.params, callbackId, response }
+  }
+}
+
 describe('serialapi', () => {
   let clock
   let MockPort
@@ -55,8 +66,8 @@ describe('serialapi', () => {
     })
 
     it('send() should accept the call and postpone until open', () => {
-      sut.send({ funcId: 0x02 })
-      sut.send({ funcId: 0x03 })
+      sut.send({ encodeRequest: testRequestEncoder(0x02) })
+      sut.send({ encodeRequest: testRequestEncoder(0x03) })
       return sut.open().then(() => {
         port.expectToReceive([0x15])
         return port.wait(10)
@@ -101,7 +112,7 @@ describe('serialapi', () => {
       it('should complete after receiving ack', () => {
         const onComplete = sinon.mock()
         const onError = sinon.mock()
-        sut.send({ funcId: 0x02 }).then(onComplete, onError)
+        sut.send({ encodeRequest: testRequestEncoder(0x02) }).then(onComplete, onError)
 
         return port.wait(10).then(() => {
           port.expectToReceive([0x01, 3, 0, 2, 0xfe])
@@ -118,7 +129,7 @@ describe('serialapi', () => {
       it('should fail after timing out', () => {
         const onComplete = sinon.mock()
         const onError = sinon.mock()
-        sut.send({ funcId: 0x02 }).then(onComplete, onError)
+        sut.send({ encodeRequest: testRequestEncoder(0x02) }).then(onComplete, onError)
 
         return port.wait(10).then(() => {
           port.expectToReceive([0x01, 3, 0, 2, 0xfe])
@@ -135,10 +146,9 @@ describe('serialapi', () => {
         it('should complete after receiving response', () => {
           const onComplete = sinon.mock()
           const onError = sinon.mock()
-          sut.send({ funcId: 0x02 }, {
-            handleResponse: function (frame, callbackId) {
-              return { funcId: frame.funcId, params: frame.params, callbackId, response: 'This is it!' }
-            }
+          sut.send({
+            encodeRequest: testRequestEncoder(0x02),
+            handleResponse: testResponseDecoder('This is it!')
           }).then(onComplete, onError)
 
           return port.wait(10).then(() => {
@@ -155,17 +165,74 @@ describe('serialapi', () => {
           }).then(() => {
             expect(onError.called).to.be.false
             expect(onComplete.calledOnce).to.be.true
-            expect(onComplete.args[0][0]).to.equal('This is it!')
+            expect(onComplete.args[0][0].response).to.equal('This is it!')
+          })
+        })
+
+        it('should complete multiple send in a row', () => {
+          const onComplete1 = sinon.mock()
+          const onError1 = sinon.mock()
+          sut.send({
+            encodeRequest: testRequestEncoder(0x02),
+            handleResponse: testResponseDecoder('This is it 1!')
+          }).then(onComplete1, onError1)
+
+          const onComplete2 = sinon.mock()
+          const onError2 = sinon.mock()
+          sut.send({
+            encodeRequest: testRequestEncoder(0x02),
+            handleResponse: testResponseDecoder('This is it 2!')
+          }).then(onComplete2, onError2)
+
+          return port.wait(10).then(() => {
+            port.expectToReceive([0x01, 3, 0, 2, 0xfe])
+            port.expectNoMoreReceivedData()
+            expect(onError1.called).to.be.false
+            expect(onComplete1.called).to.be.false
+            port.emitData([0x06, 0x01, 3, 1, 2, 0xff])
+            return port.wait(10)
+          }).then(() => {
+            port.expectToReceive([0x06, 0x01, 3, 0, 2, 0xfe])
+            expect(onError1.called).to.be.false
+            expect(onComplete1.calledOnce).to.be.true
+            expect(onComplete1.args[0][0].response).to.deep.equal('This is it 1!')
+            port.emitData([0x06, 0x01, 3, 1, 2, 0xff])
+            return port.wait(10)
+          }).then(() => {
+            port.expectToReceive([0x06])
+            expect(onError2.called).to.be.false
+            expect(onComplete2.calledOnce).to.be.true
+            expect(onComplete2.args[0][0].response).to.deep.equal('This is it 2!')
+          })
+        })
+
+        it('should complete after receiving response with the ack', () => {
+          const onComplete = sinon.mock()
+          const onError = sinon.mock()
+          sut.send({
+            encodeRequest: testRequestEncoder(0x02),
+            handleResponse: testResponseDecoder('This is it!')
+          }).then(onComplete, onError)
+
+          return port.wait(10).then(() => {
+            port.expectToReceive([0x01, 3, 0, 2, 0xfe])
+            expect(onError.called).to.be.false
+            expect(onComplete.called).to.be.false
+            port.emitData([0x06, 0x01, 3, 1, 2, 0xff])
+            return port.wait(10)
+          }).then(() => {
+            expect(onError.called).to.be.false
+            expect(onComplete.calledOnce).to.be.true
+            expect(onComplete.args[0][0].response).to.deep.equal('This is it!')
           })
         })
 
         it('should fail if response arrive after the response timeout', () => {
           const onComplete = sinon.mock()
           const onError = sinon.mock()
-          sut.send({ funcId: 0x02 }, {
-            handleResponse: function (frame, callbackId) {
-              return { funcId: frame.funcId, params: frame.params, callbackId, response: 'This is it!' }
-            }
+          sut.send({
+            encodeRequest: testRequestEncoder(0x02),
+            handleResponse: testResponseDecoder('This is it!')
           }).then(onComplete, onError)
 
           return port.wait(10).then(() => {
