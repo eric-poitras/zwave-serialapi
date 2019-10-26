@@ -6,12 +6,12 @@ const sinon = require('sinon')
 
 function testRequestEncoder (funcId, data) {
   data = data || []
-  return (request) => { return { funcId, data, request } }
+  return (request) => { return { meta: { funcId, data }, request } }
 }
 
 function testResponseDecoder (response) {
   return (frame, callbackId) => {
-    return { funcId: frame.funcId, params: frame.params, callbackId, response }
+    return { meta: { funcId: frame.funcId, params: frame.params, callbackId }, response }
   }
 }
 
@@ -263,7 +263,7 @@ describe('serialapi', () => {
 
         return port.emitData('0115004984230f0410012532272c2b7085567286ef8213').then(() => {
           expect(onRequest.calledOnce).to.be.true
-          expect(onRequest.args[0][0]).to.be.deep.equal({ funcId: 73, data: [132, 35, 15, 4, 16, 1, 37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130], updateStatus: 'NODE_INFO_RECEIVED', nodeId: 35, deviceClasses: { basic: 4, generic: 16, specific: 1 }, commandClasses: [37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130], callbackId: undefined })
+          expect(onRequest.args[0][0]).to.be.deep.equal({ updateStatus: 'NODE_INFO_RECEIVED', nodeId: 35, deviceClasses: { basic: 4, generic: 16, specific: 1 }, commandClasses: [37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130], meta: { funcId: 73, data: [132, 35, 15, 4, 16, 1, 37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130], callbackId: undefined } })
         })
       })
     })

@@ -16,9 +16,8 @@ standardDecodeCallbackSpecs(sut, {
   success: {
     1: {
       data: '01',
-      expected: {
-        callbackId: 0x01
-      }
+      callbackId: 0x01,
+      expected: {}
     }
   }
 

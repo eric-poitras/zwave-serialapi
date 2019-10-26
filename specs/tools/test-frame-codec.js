@@ -11,11 +11,14 @@ function standardEncodeRequestSpecs (funcMeta, scenarios) {
         const scenario = scenarios.success[scenarioName]
         it(`should encode frame request correctly in scenario '${scenarioName}'`, function () {
           const actualResult = encodeRequest(scenario.request, scenario.callbackId)
-          const expectedResult = Object.assign({
-            funcId,
-            data: scenario.expected,
-            callbackId: scenario.callbackId
-          }, scenario.request)
+          const expectedResult = Object.assign({}, scenario.request,
+            {
+              meta: {
+                funcId,
+                data: scenario.expected,
+                callbackId: scenario.callbackId
+              }
+            })
           expect(actualResult).to.deep.equal(expectedResult)
         })
       }
@@ -40,11 +43,14 @@ function standardDecodeResponseSpecs (funcMeta, scenarios) {
               params: Buffer.from(scenario.data, 'hex')
             }
             const actualResult = decodeResponse(dataFrame)
-            const expectedResult = Object.assign({
-              funcId,
-              data: [...dataFrame.params],
-              callbackId: scenario.callbackId
-            }, scenario.expected)
+            const expectedResult = Object.assign({}, scenario.expected,
+              {
+                meta: {
+                  funcId,
+                  data: [...dataFrame.params],
+                  callbackId: scenario.callbackId
+                }
+              })
             expect(actualResult).to.deep.equal(expectedResult)
           })
 
@@ -75,11 +81,13 @@ function standardDecodeResponseSpecs (funcMeta, scenarios) {
               params: Buffer.from(scenario.data + '0000', 'hex')
             }
             const actualResult = decodeResponse(dataFrame)
-            const expectedResult = Object.assign({
-              funcId,
-              data: [...dataFrame.params],
-              callbackId: scenario.callbackId
-            }, scenario.expected)
+            const expectedResult = Object.assign({}, scenario.expected, {
+              meta: {
+                funcId,
+                data: [...dataFrame.params],
+                callbackId: scenario.callbackId
+              }
+            })
             expect(actualResult).to.deep.equal(expectedResult)
           })
         })
@@ -104,12 +112,15 @@ function standardDecodeCallbackSpecs (funcMeta, scenarios) {
               funcId,
               params: Buffer.from(scenario.data, 'hex')
             }
-            const actualResult = decodeCallback(dataFrame, scenario.callbackId)
-            const expectedResult = Object.assign({
-              funcId,
-              data: [...dataFrame.params],
-              callbackId: scenario.callbackId
-            }, scenario.expected)
+            const actualResult = decodeCallback(dataFrame)
+            const expectedResult = Object.assign({}, scenario.expected,
+              {
+                meta: {
+                  funcId,
+                  data: [...dataFrame.params],
+                  callbackId: scenario.callbackId
+                }
+              })
             expect(actualResult).to.deep.equal(expectedResult)
           })
 
@@ -119,7 +130,7 @@ function standardDecodeCallbackSpecs (funcMeta, scenarios) {
               funcId,
               params: Buffer.from(scenario.data, 'hex')
             }
-            const result = decodeCallback(dataFrame, scenario.callbackId)
+            const result = decodeCallback(dataFrame)
             expect(result).to.be.undefined
           })
 
@@ -129,7 +140,7 @@ function standardDecodeCallbackSpecs (funcMeta, scenarios) {
               funcId: funcId - 1,
               params: Buffer.from(scenario.data, 'hex')
             }
-            const result = decodeCallback(dataFrame, scenario.callbackId)
+            const result = decodeCallback(dataFrame)
             expect(result).to.be.undefined
           })
 
@@ -139,12 +150,14 @@ function standardDecodeCallbackSpecs (funcMeta, scenarios) {
               funcId,
               params: Buffer.from(scenario.data + '0000', 'hex')
             }
-            const actualResult = decodeCallback(dataFrame, scenario.callbackId)
-            const expectedResult = Object.assign({
-              funcId,
-              data: [...dataFrame.params],
-              callbackId: scenario.callbackId
-            }, scenario.expected)
+            const actualResult = decodeCallback(dataFrame)
+            const expectedResult = Object.assign({}, scenario.expected, {
+              meta: {
+                funcId,
+                data: [...dataFrame.params],
+                callbackId: scenario.callbackId
+              }
+            })
             expect(actualResult).to.deep.equal(expectedResult)
           })
         })

@@ -46,8 +46,8 @@ standardDecodeCallbackSpecs(sut, {
   success: {
     Started: {
       data: '01015002aabb',
+      callbackId: 0x01,
       expected: {
-        callbackId: 0x01,
         status: 'STARTED',
         nodeId: 0x50,
         nodeInfo: [0xaa, 0xbb]
@@ -55,8 +55,8 @@ standardDecodeCallbackSpecs(sut, {
     },
     Done: {
       data: 'aa064f05aabb010203',
+      callbackId: 0xaa,
       expected: {
-        callbackId: 0xaa,
         status: 'DONE',
         nodeId: 0x4f,
         nodeInfo: [0xaa, 0xbb, 0x01, 0x02, 0x03]
@@ -64,8 +64,8 @@ standardDecodeCallbackSpecs(sut, {
     },
     Failed: {
       data: 'aa074f05aabb010203',
+      callbackId: 0xaa,
       expected: {
-        callbackId: 0xaa,
         status: 'FAILED',
         nodeId: 0x4f,
         nodeInfo: [0xaa, 0xbb, 0x01, 0x02, 0x03]
