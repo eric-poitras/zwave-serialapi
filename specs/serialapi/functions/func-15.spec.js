@@ -8,7 +8,6 @@ standardEncodeRequestSpecs(sut, {
       request: {},
       expected: []
     }
-
   }
 })
 
