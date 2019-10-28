@@ -1,4 +1,4 @@
-#!/home/epoitras/.nvm/versions/node/v12.4.0/bin/node
+#!/usr/bin/env node
 var SerialApi = require('./lib/serialapi')
 var myrepl = require('repl').start()
 const api = SerialApi({
