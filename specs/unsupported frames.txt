@@ -1,0 +1,13 @@
+serialapi/port frame-in: 010a00a8002401029f0400e1 +783ms
+  serialapi/api Unsupported Frame:
+  serialapi/api ZW->HOST (REQ): {"type":0,"funcId":168,"params":{"type":"Buffer","data":[0,36,1,2,159,4,0]}} +785ms
+  serialapi/port frame-out: 06 +2ms
+  serialapi/port frame-in: 010e00a800240106560120024d260064 +10s
+  serialapi/api Unsupported Frame:
+  serialapi/api ZW->HOST (REQ): {"type":0,"funcId":168,"params":{"type":"Buffer","data":[0,36,1,6,86,1,32,2,77,38,0]}} +10s
+  serialapi/port frame-out: 06 +1ms
+  serialapi/port frame-in: 010e00a80024010656015e0156130037 +2s
+  serialapi/api Unsupported Frame:
+  serialapi/api ZW->HOST (REQ): {"type":0,"funcId":168,"params":{"type":"Buffer","data":[0,36,1,6,86,1,94,1,86,19,0]}} +2s
+  serialapi/port frame-out: 06 +1ms
+  

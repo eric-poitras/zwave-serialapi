@@ -10,6 +10,8 @@ standardDecodeCallbackSpecs(sut, {
         status: {
           routeLocked: false,
           lowPower: false,
+          foreignFrame: false,
+          foreignHome: false,
           frameType: 'SINGLE'
         },
         sourceNodeId: 0x03,
@@ -22,6 +24,8 @@ standardDecodeCallbackSpecs(sut, {
         status: {
           routeLocked: false,
           lowPower: false,
+          foreignFrame: false,
+          foreignHome: false,
           frameType: 'BROADCAST'
         },
         sourceNodeId: 0x87,
@@ -34,6 +38,8 @@ standardDecodeCallbackSpecs(sut, {
         status: {
           routeLocked: false,
           lowPower: false,
+          foreignFrame: false,
+          foreignHome: false,
           frameType: 'MULTICAST'
         },
         sourceNodeId: 0x01,
@@ -46,6 +52,8 @@ standardDecodeCallbackSpecs(sut, {
         status: {
           routeLocked: false,
           lowPower: false,
+          foreignFrame: false,
+          foreignHome: false,
           frameType: 'EXPLORE'
         },
         sourceNodeId: 0x01,

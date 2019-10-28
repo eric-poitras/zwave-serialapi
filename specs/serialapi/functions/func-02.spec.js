@@ -6,7 +6,7 @@ standardDecodeResponseSpecs(sut, {
   success: {
     1: {
       data: '05001d03000000000000000000000000000000000000000000000000000000000500',
-      expected: { apiVersion: 5, apiType: 'controllerApi', timerSupported: false, controllerType: 'primary', sis: false, nodes: [{ nodeId: 1 }, { nodeId: 2 }], chipType: 5, chipVersion: 0 }
+      expected: { apiVersion: 5, apiType: 'CONTROLLER', timerSupported: false, controllerType: 'PRIMARY', sis: false, nodes: [{ nodeId: 1 }, { nodeId: 2 }], chipType: 5, chipVersion: 0 }
     }
   }
 })
