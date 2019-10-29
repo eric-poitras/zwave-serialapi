@@ -1,7 +1,7 @@
 /* eslint-disableno-unused-expressions */
 const sut = require('../../../lib/serialapi/functions/func-13')
-const { standardEncodeRequestSpecs, standardDecodeResponseSpecs, standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
-
+const { metaSpecs, standardEncodeRequestSpecs, standardDecodeResponseSpecs, standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
+metaSpecs(sut, 'sendData', 0x13)
 standardEncodeRequestSpecs(sut, {
   success: {
     'All defaults': {

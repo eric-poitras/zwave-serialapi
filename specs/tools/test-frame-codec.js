@@ -1,5 +1,25 @@
 /* eslint-disable no-unused-expressions */
 const expect = require('chai').expect
+const funExported = require('../../lib/serialapi/functions')
+
+function metaSpecs (funcMeta, expectedName, expectedFuncId) {
+  const { name, funcId } = funcMeta
+  describe(`setup for funcId 0x${expectedFuncId.toString(16)}, ${expectedName}`, defineTests)
+  function defineTests () {
+    it('should be registered with the correct name', () => {
+      expect(name).to.equal(expectedName)
+    })
+
+    it('should be registered with the correct function id', () => {
+      expect(funcId).to.equal(expectedFuncId)
+    })
+
+    it('should be registered in the function module', () => {
+      const entry = funExported.filter(module => module.funcId === funcId)
+      expect(entry).to.deep.equal([funcMeta])
+    })
+  }
+}
 
 function standardEncodeRequestSpecs (funcMeta, scenarios) {
   const { encodeRequest, name, funcId } = funcMeta
@@ -167,6 +187,7 @@ function standardDecodeCallbackSpecs (funcMeta, scenarios) {
 }
 
 module.exports = {
+  metaSpecs,
   standardEncodeRequestSpecs,
   standardDecodeResponseSpecs,
   standardDecodeCallbackSpecs

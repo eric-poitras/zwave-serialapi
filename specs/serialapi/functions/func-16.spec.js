@@ -1,6 +1,7 @@
 /* eslint-disableno-unused-expressions */
 const sut = require('../../../lib/serialapi/functions/func-16')
-const { standardEncodeRequestSpecs } = require('../../tools/test-frame-codec')
+const { metaSpecs, standardEncodeRequestSpecs } = require('../../tools/test-frame-codec')
+metaSpecs(sut, 'sendDataAbort', 0x16)
 
 standardEncodeRequestSpecs(sut, {
   success: {

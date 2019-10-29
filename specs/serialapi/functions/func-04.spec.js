@@ -1,7 +1,8 @@
 /* eslint-disableno-unused-expressions */
 const sut = require('../../../lib/serialapi/functions/func-04')
-const { standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
+const { metaSpecs, standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
 
+metaSpecs(sut, 'applicationCommandHandler', 0x04)
 standardDecodeCallbackSpecs(sut, {
   success: {
     SINGLE: {

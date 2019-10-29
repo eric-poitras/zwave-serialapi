@@ -1,6 +1,7 @@
 /* eslint-disableno-unused-expressions */
 const sut = require('../../../lib/serialapi/functions/func-14')
-const { standardEncodeRequestSpecs, standardDecodeResponseSpecs, standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
+const { metaSpecs, standardEncodeRequestSpecs, standardDecodeResponseSpecs, standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
+metaSpecs(sut, 'sendDataMulti', 0x14)
 
 standardEncodeRequestSpecs(sut, {
   success: {

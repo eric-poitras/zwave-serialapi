@@ -2,7 +2,7 @@
 var SerialApi = require('./lib/serialapi')
 var myrepl = require('repl').start()
 const api = SerialApi({
-  port: '/dev/ttyACM2'
+  port: '/dev/ttyACM0'
 })
 api.open()
 

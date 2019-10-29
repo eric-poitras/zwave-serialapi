@@ -1,6 +1,7 @@
 /* eslint-disableno-unused-expressions */
 const sut = require('../../../lib/serialapi/functions/func-50')
-const { standardEncodeRequestSpecs, standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
+const { metaSpecs, standardEncodeRequestSpecs, standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
+metaSpecs(sut, 'setLearnMode', 0x50)
 
 // serialapi:api ZW->HOST (REQ): {"funcId":80,"data":[2,1,1,0],"callback":{"status":"STARTED","nodeId":1,"nodeInfo":[],"callbackId":2}} +1m
 // serialapi:api ZW->HOST (REQ): {"funcId":80,"data":[2,6,34,0],"callback":{"status":"DONE","nodeId":34,"nodeInfo":[],"callbackId":2}} +22s

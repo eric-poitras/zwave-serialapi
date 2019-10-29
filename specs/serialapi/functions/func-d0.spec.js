@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
-const { standardEncodeRequestSpecs } = require('../../tools/test-frame-codec')
+const { metaSpecs, standardEncodeRequestSpecs } = require('../../tools/test-frame-codec')
 const sut = require('../../../lib/serialapi/functions/func-d0')
+metaSpecs(sut, 'setPromiscuousMode', 0xd0)
 
 standardEncodeRequestSpecs(sut, {
   success: {

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
-const { standardDecodeResponseSpecs } = require('../../tools/test-frame-codec')
+const { metaSpecs, standardDecodeResponseSpecs } = require('../../tools/test-frame-codec')
 const sut = require('../../../lib/serialapi/functions/func-07')
-
+metaSpecs(sut, 'getCapabilities', 0x07)
 standardDecodeResponseSpecs(sut, {
   success: {
     1: {

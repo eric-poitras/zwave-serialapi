@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
-const { standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
+const { metaSpecs, standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
 const sut = require('../../../lib/serialapi/functions/func-49')
+metaSpecs(sut, 'applicationControllerUpdate', 0x49)
 
 standardDecodeCallbackSpecs(sut, {
   success: {

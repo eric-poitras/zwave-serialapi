@@ -1,6 +1,7 @@
 /* eslint-disableno-unused-expressions */
 const sut = require('../../../lib/serialapi/functions/func-15')
-const { standardEncodeRequestSpecs, standardDecodeResponseSpecs } = require('../../tools/test-frame-codec')
+const { metaSpecs, standardEncodeRequestSpecs, standardDecodeResponseSpecs } = require('../../tools/test-frame-codec')
+metaSpecs(sut, 'getVersion', 0x15)
 
 standardEncodeRequestSpecs(sut, {
   success: {

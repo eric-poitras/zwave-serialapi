@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
-const { standardEncodeRequestSpecs, standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
+const { metaSpecs, standardEncodeRequestSpecs, standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
 const sut = require('../../../lib/serialapi/functions/func-42')
+metaSpecs(sut, 'setDefault', 0x42)
 
 standardEncodeRequestSpecs(sut, {
   success: {

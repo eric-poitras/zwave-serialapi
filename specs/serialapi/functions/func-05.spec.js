@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
-const { standardDecodeResponseSpecs } = require('../../tools/test-frame-codec')
+const { metaSpecs, standardDecodeResponseSpecs } = require('../../tools/test-frame-codec')
 const sut = require('../../../lib/serialapi/functions/func-05')
-
+metaSpecs(sut, 'getControllerCapabilities', 0x05)
 standardDecodeResponseSpecs(sut, {
   success: {
     isSecondary: {

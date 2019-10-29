@@ -1,6 +1,7 @@
 /* eslint-disableno-unused-expressions */
 const sut = require('../../../lib/serialapi/functions/func-a8')
-const { standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
+const { metaSpecs, standardDecodeCallbackSpecs } = require('../../tools/test-frame-codec')
+metaSpecs(sut, 'applicationCommandHandlerBridge', 0xa8)
 
 standardDecodeCallbackSpecs(sut, {
   success: {

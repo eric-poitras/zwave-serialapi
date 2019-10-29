@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
-const { standardEncodeRequestSpecs, standardDecodeResponseSpecs } = require('../../tools/test-frame-codec')
+const { metaSpecs, standardEncodeRequestSpecs, standardDecodeResponseSpecs } = require('../../tools/test-frame-codec')
 const sut = require('../../../lib/serialapi/functions/func-61')
+metaSpecs(sut, 'removeFailedNode', 0x61)
 
 standardEncodeRequestSpecs(sut, {
   success: {
