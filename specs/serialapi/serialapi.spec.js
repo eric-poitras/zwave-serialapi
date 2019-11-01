@@ -302,14 +302,49 @@ describe('serialapi', () => {
       })
     })
 
-    describe('on(\'receive\')', () => {
+    describe('on(\'<funcName>\')', () => {
       it('should emit requests with decoded callback', () => {
-        const onRequest = sinon.mock()
-        sut.on('request', onRequest)
+        const onApplicationControllerUpdate = sinon.mock()
+        sut.on('applicationControllerUpdate', onApplicationControllerUpdate)
 
         return port.emitData('0115004984230f0410012532272c2b7085567286ef8213').then(() => {
-          expect(onRequest.calledOnce).to.be.true
-          expect(onRequest.args[0][0]).to.be.deep.equal({ updateStatus: 'NODE_INFO_RECEIVED', nodeId: 35, nodeInfo: { basicClass: 4, genericClass: 16, specificClass: 1, commandClasses: [37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130] }, meta: { funcId: 73, data: [132, 35, 15, 4, 16, 1, 37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130], callbackId: undefined } })
+          expect(onApplicationControllerUpdate.calledOnce).to.be.true
+          expect(onApplicationControllerUpdate.args[0][0]).to.be.deep.equal({ updateStatus: 'NODE_INFO_RECEIVED', nodeId: 35, nodeInfo: { basicClass: 4, genericClass: 16, specificClass: 1, commandClasses: [37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130] }, meta: { funcId: 73, data: [132, 35, 15, 4, 16, 1, 37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130], callbackId: undefined } })
+        })
+      })
+    })
+
+    describe('on(\'frame\')', () => {
+      it('should emit raw request', () => {
+        const onFrame = sinon.mock()
+        sut.on('frame', onFrame)
+
+        return port.emitData('0115004984230f0410012532272c2b7085567286ef8213').then(() => {
+          expect(onFrame.calledOnce).to.be.true
+          expect(onFrame.args[0][0]).to.be.deep.equal({
+            funcId: 73,
+            params: Buffer.from([
+              132,
+              35,
+              15,
+              4,
+              16,
+              1,
+              37,
+              50,
+              39,
+              44,
+              43,
+              112,
+              133,
+              86,
+              114,
+              134,
+              239,
+              130
+            ]),
+            type: 0
+          })
         })
       })
     })
