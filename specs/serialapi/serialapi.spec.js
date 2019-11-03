@@ -309,7 +309,9 @@ describe('serialapi', () => {
 
         return port.emitData('0115004984230f0410012532272c2b7085567286ef8213').then(() => {
           expect(onApplicationControllerUpdate.calledOnce).to.be.true
-          expect(onApplicationControllerUpdate.args[0][0]).to.be.deep.equal({ updateStatus: 'NODE_INFO_RECEIVED', nodeId: 35, nodeInfo: { basicClass: 4, genericClass: 16, specificClass: 1, commandClasses: [37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130] }, meta: { funcId: 73, data: [132, 35, 15, 4, 16, 1, 37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130], callbackId: undefined } })
+          const request = onApplicationControllerUpdate.args[0][0]
+          expect(request).to.be.deep.equal({ updateStatus: 'NODE_INFO_RECEIVED', nodeId: 35, nodeInfo: { basicClass: 4, genericClass: 16, specificClass: 1, commandClasses: [37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130] } })
+          expect(request.meta).to.be.deep.equal({ funcId: 73, data: [132, 35, 15, 4, 16, 1, 37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130], callbackId: undefined })
         })
       })
     })
