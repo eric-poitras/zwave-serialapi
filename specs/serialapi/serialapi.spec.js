@@ -325,26 +325,7 @@ describe('serialapi', () => {
           expect(onFrame.calledOnce).to.be.true
           expect(onFrame.args[0][0]).to.be.deep.equal({
             funcId: 73,
-            params: Buffer.from([
-              132,
-              35,
-              15,
-              4,
-              16,
-              1,
-              37,
-              50,
-              39,
-              44,
-              43,
-              112,
-              133,
-              86,
-              114,
-              134,
-              239,
-              130
-            ]),
+            params: Buffer.from([132, 35, 15, 4, 16, 1, 37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130]),
             type: 0
           })
         })
