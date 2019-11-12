@@ -53,12 +53,12 @@ describe('serialapi', () => {
     })
 
     it('isOpen() should return false', () => {
-      expect(sut.isOpen()).to.be.false
+      expect(sut.isOpen.value).to.be.false
     })
 
     it('open() should open it', () => {
       return sut.open().then(() => {
-        expect(sut.isOpen()).to.be.true
+        expect(sut.isOpen.value).to.be.true
 
         // Serial Api should send a NAK on init
         port.expectToReceive([0x15], 'Controller reset: Initial NAK')
@@ -302,24 +302,26 @@ describe('serialapi', () => {
       })
     })
 
-    describe('on(\'<funcName>\')', () => {
+    describe('inboundRequests', () => {
       it('should emit requests with decoded callback', () => {
         const onApplicationControllerUpdate = sinon.mock()
-        sut.on('applicationControllerUpdate', onApplicationControllerUpdate)
+        const sub = sut.inboundRequests.subscribe(onApplicationControllerUpdate)
 
         return port.emitData('0115004984230f0410012532272c2b7085567286ef8213').then(() => {
           expect(onApplicationControllerUpdate.calledOnce).to.be.true
-          const request = onApplicationControllerUpdate.args[0][0]
+          const request = onApplicationControllerUpdate.args[0][0].request
           expect(request).to.be.deep.equal({ updateStatus: 'NODE_INFO_RECEIVED', nodeId: 35, nodeInfo: { basicClass: 4, genericClass: 16, specificClass: 1, commandClasses: [37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130] } })
           expect(request.meta).to.be.deep.equal({ funcId: 73, data: [132, 35, 15, 4, 16, 1, 37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130], callbackId: undefined })
+        }).finally(() => {
+          sub.unsubscribe()
         })
       })
     })
 
-    describe('on(\'frame\')', () => {
+    describe('frames', () => {
       it('should emit raw request', () => {
         const onFrame = sinon.mock()
-        sut.on('frame', onFrame)
+        const sub = sut.frames.subscribe(onFrame)
 
         return port.emitData('0115004984230f0410012532272c2b7085567286ef8213').then(() => {
           expect(onFrame.calledOnce).to.be.true
@@ -328,16 +330,18 @@ describe('serialapi', () => {
             params: Buffer.from([132, 35, 15, 4, 16, 1, 37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130]),
             type: 0
           })
+        }).finally(() => {
+          sub.unsubscribe()
         })
       })
     })
 
     describe('close()', () => {
       it('should close the serialapi', () => {
-        expect(sut.isOpen()).to.be.true
+        expect(sut.isOpen.value).to.be.true
         expect(port.api.close.calledOnce).to.be.false
         return sut.close().then(() => {
-          expect(sut.isOpen()).to.be.false
+          expect(sut.isOpen.value).to.be.false
           expect(port.api.close.calledOnce).to.be.true
         })
       })

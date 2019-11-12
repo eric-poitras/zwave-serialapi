@@ -15,7 +15,7 @@ function metaSpecs (funcMeta, expectedName, expectedFuncId) {
     })
 
     it('should be registered in the function module', () => {
-      const entry = funExported.filter(module => module.funcId === funcId)
+      const entry = funExported.definitions.filter(module => module.funcId === funcId)
       expect(entry).to.deep.equal([funcMeta])
     })
   }

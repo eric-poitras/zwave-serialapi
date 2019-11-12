@@ -46,7 +46,7 @@ describe('zwave port', function () {
       expect(port.api.constructor.withArgs(port.name, port.parameters).calledOnce).to.be.true
       expect(port.api.open.notCalled).to.be.true
       expect(hmac).to.be.not.empty
-      expect(hmac.isOpen()).to.be.false
+      expect(hmac.isOpen.value).to.be.false
     })
   })
 
@@ -73,52 +73,50 @@ describe('zwave port', function () {
       expect(port.api.open.notCalled).to.be.true
 
       const onOpen = sinon.spy()
-      sut.on('open', onOpen)
+      const sub = sut.isOpen.subscribe(onOpen)
 
       const result = sut.open().then(() => {
-        expect(sut.isOpen()).to.be.true
+        expect(sut.isOpen.value).to.be.true
         expect(port.api.open.calledOnce).to.be.true
 
         // State change events are emitted
-        expect(onOpen.calledOnce).to.be.true
+        expect(onOpen.withArgs(true).calledOnce).to.be.true
 
         // Serial Api should send a NAK on init
         port.expectToReceive([Consts.NAK], 'Controller reset: Initial NAK')
       })
-      expect(sut.isOpen()).to.be.false
-      return result
+      expect(sut.isOpen.value).to.be.false
+      return result.finally(() => sub.unsubscribe())
     })
 
     it('method open() and close() should work even when used multiple times', () => {
       expect(port.api.open.notCalled).to.be.true
 
-      const onOpen = sinon.spy()
-      const onClose = sinon.spy()
-      sut.on('open', onOpen)
-      sut.on('close', onClose)
+      const onOpenChanged = sinon.spy()
+      const sub = sut.isOpen.subscribe(onOpenChanged)
 
       const result = sut.open().then(() => {
-        expect(sut.isOpen()).to.be.true
+        expect(sut.isOpen.value).to.be.true
         expect(port.api.open.calledOnce).to.be.true
 
-        expect(onOpen.calledOnce).to.be.true
-        expect(onClose.calledOnce).to.be.false
+        expect(onOpenChanged.withArgs(true).calledOnce).to.be.true
+        expect(onOpenChanged.withArgs(false).calledTwice).to.be.false
         port.expectToReceive([Consts.NAK], 'Controller reset: Initial NAK')
         return sut.close()
       }).then(() => {
-        expect(sut.isOpen()).to.be.false
+        expect(sut.isOpen.value).to.be.false
         expect(port.api.open.calledOnce).to.be.true
-        expect(onOpen.calledOnce).to.be.true
-        expect(onClose.calledOnce).to.be.true
+        expect(onOpenChanged.withArgs(true).calledOnce).to.be.true
+        expect(onOpenChanged.withArgs(false).calledTwice).to.be.true
         return sut.open()
       }).then(() => {
-        expect(sut.isOpen()).to.be.true
+        expect(sut.isOpen.value).to.be.true
         expect(port.api.open.calledTwice).to.be.true
-        expect(onOpen.calledTwice).to.be.true
-        expect(onClose.calledOnce).to.be.true
+        expect(onOpenChanged.withArgs(true).calledTwice).to.be.true
+        expect(onOpenChanged.withArgs(false).calledTwice).to.be.true
       })
-      expect(sut.isOpen()).to.be.false
-      return result
+      expect(sut.isOpen.value).to.be.false
+      return result.finally(() => sub.unsubscribe())
     })
 
     it('method open() should fail if serial port fail to open', () => {
@@ -130,13 +128,13 @@ describe('zwave port', function () {
 
       const result = sut.open().then(shouldNotHappens, (err) => {
         expect(err).to.be.not.null
-        expect(sut.isOpen()).to.be.false
+        expect(sut.isOpen.value).to.be.false
         expect(port.api.open.calledOnce).to.be.true
 
         // State change events are emitted
         expect(onOpen.calledOnce).to.be.false
       })
-      expect(sut.isOpen()).to.be.false
+      expect(sut.isOpen.value).to.be.false
       return result
     })
   })
@@ -165,7 +163,7 @@ describe('zwave port', function () {
 
     it('method open() on an already opened port should throw an exception', () => {
       return sut.open().then(() => {
-        expect(sut.isOpen()).to.be.true
+        expect(sut.isOpen.value).to.be.true
       })
     })
 
@@ -334,24 +332,23 @@ describe('zwave port', function () {
       expect(port.api.close.notCalled).to.be.true
 
       const onCloseSpy = sinon.spy()
-      sut.on('close', onCloseSpy)
+      const sub = sut.isOpen.subscribe(onCloseSpy)
 
-      const result = sut.close().then(() => {
-        expect(sut.isOpen()).to.be.false
+      return sut.close().then(() => {
+        expect(sut.isOpen.value).to.be.false
         expect(port.api.close.calledOnce).to.be.true
-        expect(onCloseSpy.calledOnce).to.true
-      })
-      return result
+        expect(onCloseSpy.withArgs(false).calledOnce).to.true
+      }).finally(() => sub.unsubscribe())
     })
 
     it('if serial port close, the zwave port should close as well,', () => {
       const onClose = sinon.spy()
-      sut.on('close', onClose)
+      const sub = sut.isOpen.subscribe(onClose)
 
       return port.close().then(() => {
-        expect(sut.isOpen()).to.be.false
-        expect(onClose.calledOnce).to.be.true
-      })
+        expect(sut.isOpen.value).to.be.false
+        expect(onClose.calledTwice).to.be.true
+      }).finally(() => sub.unsubscribe())
     })
   })
 })
