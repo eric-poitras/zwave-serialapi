@@ -2,95 +2,96 @@
 const expect = require('chai').expect
 const sinon = require('sinon')
 const consts = require('../../../lib/serialapi/consts')
-const proxyquire = require('proxyquire')
+const functions = require('../../../lib/serialapi/functions')
 
 describe('functions (index.js)', () => {
   describe('processCallback', () => {
-    let decodeCallback
-    let sut
-
-    beforeEach(() => {
-      decodeCallback = sinon.mock().returns(42)
-      sut = proxyquire('../../../lib/serialapi/functions', {
-        './func-02': { name: 'testName', decodeCallback }
-      }).processCallback
-    })
+    const sut = functions.processCallback
 
     it('should decode request frame with matching decoder', () => {
+      const decodeCallback = sinon.mock().returns(42)
+      const funcMeta = {
+        decodeCallback
+      }
       const frame = {
         type: consts.REQUEST,
         funcId: 0x02
       }
-      const res = sut(frame)
+      const res = sut(funcMeta, frame)
       expect(decodeCallback.withArgs(frame).calledOnce).to.be.true
-      expect(res).to.be.deep.equal({ name: 'testName', request: 42 })
+      expect(res).to.be.deep.equal(42)
     })
 
-    it('should node decode request frame with no decoder', () => {
-      const decodeCallback = sinon.mock().returns(42)
+    it('should not decode request frame with no decoder', () => {
+      const decodeCallback = sinon.mock().returns(undefined)
+      const funcMeta = {
+        decodeCallback
+      }
       const frame = {
         type: consts.REQUEST,
         funcId: 0x00
       }
-      const res = sut(frame)
-      expect(decodeCallback.notCalled).to.be.true
+      const res = sut(funcMeta, frame)
+      expect(decodeCallback.calledOnce).to.be.true
       expect(res).to.be.undefined
     })
 
     it('should not decode response frame', () => {
-      const decodeCallback = sinon.mock()
+      const decodeCallback = sinon.mock().returns(42)
+      const funcMeta = {
+        decodeCallback
+      }
       const frame = {
         type: consts.RESPONSE,
-        funcId: 0x01
+        funcId: 0x02
       }
-      const lookup = {
-        0x01: {
-          decodeCallback
-        }
-      }
-      const res = sut(lookup, frame)
+      const res = sut(funcMeta, frame)
       expect(decodeCallback.notCalled).to.be.true
       expect(res).to.be.undefined
     })
   })
 
   describe('decodeResponseFrame', () => {
-    let decodeResponse
-    let sut
-
-    beforeEach(() => {
-      decodeResponse = sinon.mock().returns(42)
-      sut = proxyquire('../../../lib/serialapi/functions', {
-        './func-02': { name: 'testName', decodeResponse }
-      }).processResponse
-    })
+    const sut = functions.processResponse
 
     it('should decode response frame with matching decoder', () => {
+      const decodeResponse = sinon.mock().returns(42)
+      const funcMeta = {
+        decodeResponse
+      }
       const frame = {
         type: consts.RESPONSE,
         funcId: 0x02
       }
-      const res = sut(frame)
+      const res = sut(funcMeta, frame)
       expect(decodeResponse.calledOnce).to.be.true
-      expect(res).to.be.deep.equal({ name: 'testName', response: 42 })
+      expect(res).to.be.deep.equal(42)
     })
 
     it('should node decode response frame with no decoder', () => {
+      const decodeResponse = sinon.mock().returns(undefined)
+      const funcMeta = {
+        decodeResponse
+      }
       const frame = {
         type: consts.RESPONSE,
         funcId: 0x00
       }
-      const res = sut(frame)
-      expect(decodeResponse.notCalled).to.be.true
+      const res = sut(funcMeta, frame)
+      expect(decodeResponse.calledOnce).to.be.true
       expect(res).to.be.undefined
     })
 
     it('should not decode request frame', () => {
+      const decodeResponse = sinon.mock().returns(42)
+      const funcMeta = {
+        decodeResponse
+      }
       const frame = {
         type: consts.REQUEST,
         funcId: 0x02
       }
-      const res = sut(frame)
+      const res = sut(funcMeta, frame)
       expect(decodeResponse.notCalled).to.be.true
       expect(res).to.be.undefined
     })

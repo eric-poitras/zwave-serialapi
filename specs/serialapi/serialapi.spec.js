@@ -66,8 +66,8 @@ describe('serialapi', () => {
     })
 
     it('send() should accept the call and postpone until open', () => {
-      sut.send({ encodeRequest: testRequestEncoder(0x02) })
-      sut.send({ encodeRequest: testRequestEncoder(0x03) })
+      sut.send({}, {}, { encodeRequest: testRequestEncoder(0x02) })
+      sut.send({}, {}, { encodeRequest: testRequestEncoder(0x03) })
       return sut.open().then(() => {
         port.expectToReceive([0x15])
         return port.wait(10)
@@ -112,7 +112,7 @@ describe('serialapi', () => {
       it('should complete after receiving ack', () => {
         const onComplete = sinon.mock()
         const onError = sinon.mock()
-        sut.send({ encodeRequest: testRequestEncoder(0x02) }).then(onComplete, onError)
+        sut.send({}, {}, { encodeRequest: testRequestEncoder(0x02) }).then(onComplete, onError)
 
         return port.wait(10).then(() => {
           port.expectToReceive([0x01, 3, 0, 2, 0xfe])
@@ -129,7 +129,7 @@ describe('serialapi', () => {
       it('should fail after timing out', () => {
         const onComplete = sinon.mock()
         const onError = sinon.mock()
-        sut.send({ encodeRequest: testRequestEncoder(0x02) }).then(onComplete, onError)
+        sut.send({}, {}, { encodeRequest: testRequestEncoder(0x02) }).then(onComplete, onError)
 
         return port.wait(10).then(() => {
           port.expectToReceive([0x01, 3, 0, 2, 0xfe])
@@ -147,9 +147,9 @@ describe('serialapi', () => {
       it('should complete after receiving response', () => {
         const onComplete = sinon.mock()
         const onError = sinon.mock()
-        sut.send({
+        sut.send({}, {}, {
           encodeRequest: testRequestEncoder(0x02),
-          handleResponse: testResponseDecoder('This is it!')
+          decodeResponse: testResponseDecoder('This is it!')
         }).then(onComplete, onError)
 
         return port.wait(10).then(() => {
@@ -173,16 +173,16 @@ describe('serialapi', () => {
       it('should complete multiple send in a row', () => {
         const onComplete1 = sinon.mock()
         const onError1 = sinon.mock()
-        sut.send({
+        sut.send({}, {}, {
           encodeRequest: testRequestEncoder(0x02),
-          handleResponse: testResponseDecoder('This is it 1!')
+          decodeResponse: testResponseDecoder('This is it 1!')
         }).then(onComplete1, onError1)
 
         const onComplete2 = sinon.mock()
         const onError2 = sinon.mock()
-        sut.send({
+        sut.send({}, {}, {
           encodeRequest: testRequestEncoder(0x02),
-          handleResponse: testResponseDecoder('This is it 2!')
+          decodeResponse: testResponseDecoder('This is it 2!')
         }).then(onComplete2, onError2)
 
         return port.wait(10).then(() => {
@@ -210,9 +210,9 @@ describe('serialapi', () => {
       it('should complete after receiving response with the ack', () => {
         const onComplete = sinon.mock()
         const onError = sinon.mock()
-        sut.send({
+        sut.send({}, {}, {
           encodeRequest: testRequestEncoder(0x02),
-          handleResponse: testResponseDecoder('This is it!')
+          decodeResponse: testResponseDecoder('This is it!')
         }).then(onComplete, onError)
 
         return port.wait(10).then(() => {
@@ -231,9 +231,9 @@ describe('serialapi', () => {
       it('should fail if response arrive after the response timeout', () => {
         const onComplete = sinon.mock()
         const onError = sinon.mock()
-        sut.send({
+        sut.send({}, {}, {
           encodeRequest: testRequestEncoder(0x02),
-          handleResponse: testResponseDecoder('This is it!')
+          decodeResponse: testResponseDecoder('This is it!')
         }).then(onComplete, onError)
 
         return port.wait(10).then(() => {
@@ -264,11 +264,10 @@ describe('serialapi', () => {
         const onEncodeResponse = sinon.spy(testResponseDecoder('This is it!'))
         const onEncodeCallback = sinon.mock()
         const params = Symbol('request')
-        sut.send({
-          params,
+        sut.send(params, {}, {
           encodeRequest: onEncodeRequest,
-          handleResponse: onEncodeResponse,
-          handleCallback: onEncodeCallback
+          decodeResponse: onEncodeResponse,
+          decodeCallback: onEncodeCallback
         }).then(onComplete, onError)
 
         // Validate that the encode request is called with a callbackId
@@ -309,7 +308,7 @@ describe('serialapi', () => {
 
         return port.emitData('0115004984230f0410012532272c2b7085567286ef8213').then(() => {
           expect(onApplicationControllerUpdate.calledOnce).to.be.true
-          const request = onApplicationControllerUpdate.args[0][0].request
+          const request = onApplicationControllerUpdate.args[0][0]
           expect(request).to.be.deep.equal({ updateStatus: 'NODE_INFO_RECEIVED', nodeId: 35, nodeInfo: { basicClass: 4, genericClass: 16, specificClass: 1, commandClasses: [37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130] } })
           expect(request.meta).to.be.deep.equal({ funcId: 73, data: [132, 35, 15, 4, 16, 1, 37, 50, 39, 44, 43, 112, 133, 86, 114, 134, 239, 130], callbackId: undefined })
         }).finally(() => {
