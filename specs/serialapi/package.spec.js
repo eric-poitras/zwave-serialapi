@@ -2,7 +2,7 @@
 const expect = require('chai').expect
 
 const serialApi = require('../..')
-const serialApiImpl = require('../../lib/serialapi')
+const serialApiImpl = require('../../lib/serialapi').serialApi
 
 describe('serialapi package', () => {
   it('should resolve to the serialapi function', () => {

@@ -41,7 +41,7 @@ describe('serialapi', () => {
       })
       sut = proxyquire('../../lib/serialapi/serialapi', {
         './port': zwport
-      })({
+      }).serialApi({
         port: port.name
       })
     })
@@ -95,7 +95,7 @@ describe('serialapi', () => {
       })
       sut = proxyquire('../../lib/serialapi/serialapi', {
         './port': zwport
-      })({
+      }).serialApi({
         port: port.name
       })
       return sut.open().then(() => {
