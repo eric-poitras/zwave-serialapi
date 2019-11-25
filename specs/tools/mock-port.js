@@ -1,6 +1,8 @@
 const serialport = require('serialport')
 const sinon = require('sinon').createSandbox('serialport.mock')
 const MockBinding = require('@serialport/binding-mock')
+const frames = require('../../lib/serialapi/frames')
+const consts = require('../../lib/serialapi/consts')
 
 function setupMockPort (name) {
   const parameters = {
@@ -68,12 +70,38 @@ function setupMockPort (name) {
     return wait(0)
   }
 
+  function emitAck () {
+    emitData('06')
+  }
+
+  function emitRequest (funcId, data) {
+    data = data || Buffer.alloc(0)
+    const buf = frames.encodeDataFrame(consts.REQUEST, funcId, data)
+    return emitData(buf)
+  }
+
+  function emitResponse (funcId, data) {
+    data = data || Buffer.alloc(0)
+    const buf = frames.encodeDataFrame(consts.RESPONSE, funcId, data)
+    return emitData(buf)
+  }
+
   function expectToReceive (expected, msg) {
     expected = Buffer.from(expected)
     const actual = recvData(expected.length)
     if (!actual.equals(expected)) {
       throw new Error(`Expected to receive ${expected.toString('hex')} but received ${actual.toString('hex')}. ${msg}.`)
     }
+  }
+
+  function expectAck () {
+    return expectToReceive([0x06])
+  }
+
+  function expectRequest (funcId, data) {
+    data = data || Buffer.alloc(0)
+    const buf = frames.encodeDataFrame(consts.REQUEST, funcId, data)
+    return expectToReceive(buf)
   }
 
   function expectNoMoreReceivedData () {
@@ -110,7 +138,12 @@ function setupMockPort (name) {
     recvData,
     flushRecvData,
     emitData,
+    emitAck,
+    emitRequest,
+    emitResponse,
     expectToReceive,
+    expectAck,
+    expectRequest,
     expectNoMoreReceivedData,
     close
   }

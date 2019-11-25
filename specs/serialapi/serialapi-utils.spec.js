@@ -1,12 +1,35 @@
 /* eslint-disable no-unused-expressions */
 const expect = require('chai').expect
 const sinon = require('sinon')
-const consts = require('../../../lib/serialapi/consts')
-const functions = require('../../../lib/serialapi/functions')
+const consts = require('../../lib/serialapi/consts')
+const serialApiUtils = require('../../lib/serialapi/serialapi-utils')
 
-describe('functions (index.js)', () => {
+describe('serialApiUtils', () => {
+  describe('buildDefinitionLookups', () => {
+    const sut = serialApiUtils.buildDefinitionsLookups
+
+    it('should index by Id and also leave the flat list.', () => {
+      const definition1 = {
+        funcId: 0x01
+      }
+      const definition2 = {
+        funcId: 0x02
+      }
+      const result = sut([definition1, definition2])
+
+      expect(result).to.be.an('object')
+      expect(result.definitions).to.be.an('array')
+      expect(result.definitionsById).to.be.an('object')
+      expect(result.definitions).to.deep.contains(definition1)
+      expect(result.definitions).to.deep.contains(definition2)
+      expect(Object.keys(result.definitionsById)).to.be.deep.equal(['1', '2'])
+      expect(result.definitionsById['1']).to.be.deep.equal(definition1)
+      expect(result.definitionsById['2']).to.be.deep.equal(definition2)
+    })
+  })
+
   describe('processCallback', () => {
-    const sut = functions.processCallback
+    const sut = serialApiUtils.processCallback
 
     it('should decode request frame with matching decoder', () => {
       const decodeCallback = sinon.mock().returns(42)
@@ -52,7 +75,7 @@ describe('functions (index.js)', () => {
   })
 
   describe('decodeResponseFrame', () => {
-    const sut = functions.processResponse
+    const sut = serialApiUtils.processResponse
 
     it('should decode response frame with matching decoder', () => {
       const decodeResponse = sinon.mock().returns(42)

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 const expect = require('chai').expect
 const sinon = require('sinon')
-const proxyquire = require('proxyquire')
+const proxyquire = require('proxyquire').noPreserveCache().noCallThru()
 const Consts = require('../../lib/serialapi/consts')
 const mockTime = require('../tools/mock-time')
 
@@ -28,7 +28,8 @@ describe('zwave port', function () {
     beforeEach(function () {
       port = MockPort('/dev/ttyMock1')
       sut = proxyquire('../../lib/serialapi/port', {
-        serialport: port.api.constructor
+        serialport: port.api.constructor,
+        '@global': true
       })
     })
 
