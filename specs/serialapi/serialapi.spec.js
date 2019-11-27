@@ -232,7 +232,7 @@ describe('serialapispec', () => {
     })
 
     describe('send() with response and callbackId', () => {
-      it('should complete after receiving response', () => {
+      it('should complete after receiving response and provide a callbacks observable', () => {
         const onComplete = sinon.mock()
         const onError = sinon.mock()
         const params = Symbol('request')
@@ -274,8 +274,7 @@ describe('serialapispec', () => {
           expect(response.callbacks).to.be.a('object')
           expect(response.callbacks.subscribe).to.be.a('function')
 
-          console.log(callbackId)
-          port.emitRequest(22, [callbackId])
+          port.emitRequest(22, [callbackId, false])
 
           return port.wait(10)
         }).then(() => {

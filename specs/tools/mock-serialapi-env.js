@@ -28,8 +28,10 @@ function buildTestFunction (name, funcId, opts) {
     result.decodeCallback = sinon.spy(buildCallbackDecoder(funcId, (data, response) => {
       Object.assign(response, opts.callback)
       const callbackId = data.readByte()
+      const hasCallback = data.readByte()
       const result = {}
       if (callbackId) result.callbackId = callbackId
+      if (typeof hasCallback !== 'undefined') result.hasCallback = hasCallback !== 0
       return result
     }))
   }
