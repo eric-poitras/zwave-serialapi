@@ -87,13 +87,15 @@ standardDecodeResponseSpecs(sut, {
       data: '01',
       expected: {
         success: true
-      }
+      },
+      hasCallback: true
     },
     2: {
       data: '00',
       expected: {
         success: false
-      }
+      },
+      hasCallback: false
     }
   }
 })

@@ -3,6 +3,7 @@ const expect = require('chai').expect
 const mockTime = require('../tools/mock-time')
 const createMockSerialApiEnv = require('../tools/mock-serialapi-env')
 const sinon = require('sinon')
+const { count } = require('rxjs/operators')
 
 describe('serialapispec', () => {
   let clock
@@ -195,6 +196,7 @@ describe('serialapispec', () => {
           port.emitResponse(12)
           return port.wait(10)
         }).then(() => {
+          port.expectAck()
           expect(onError.called).to.be.false
           expect(onComplete.calledOnce).to.be.true
           expect(onComplete.args[0][0].response).to.deep.equal('bidi12')
@@ -240,28 +242,51 @@ describe('serialapispec', () => {
         // Validate that the encode request is called with a callbackId
         expect(fun.encodeRequest.calledOnce).to.be.true
         expect(fun.encodeRequest.args[0][0]).to.deep.equal(params)
-        expect(fun.encodeRequest.args[0][1]).to.be.a('number')
-        const callbackId = fun.encodeRequest.args[0][1]
+        expect(fun.encodeRequest.args[0][1].callbackId).to.be.a('number')
+        const callbackId = fun.encodeRequest.args[0][1].callbackId
         expect(callbackId !== 0).to.be.true
 
+        let response
         return port.wait(10).then(() => {
           port.expectRequest(22)
+
           expect(onError.called).to.be.false
           expect(onComplete.called).to.be.false
+
           port.emitAck()
           return port.wait(10)
         }).then(() => {
           expect(onError.called).to.be.false
           expect(onComplete.called).to.be.false
+
           port.emitResponse(22)
           return port.wait(10)
         }).then(() => {
-          // Validate onEncodeResponse to be called with correct parameters
+          port.expectAck()
+
           expect(fun.decodeResponse.calledOnce).to.be.true
           expect(fun.decodeResponse.args[0][0]).to.be.deep.equal({ type: 1, funcId: 22, params: Buffer.alloc(0) })
           expect(onError.called).to.be.false
           expect(onComplete.calledOnce).to.be.true
-          expect(onComplete.args[0][0]).to.deep.equal({ response: 'bidiWithCallback22' })
+
+          response = onComplete.args[0][0]
+          expect(response).to.deep.equal({ response: 'bidiWithCallback22' })
+          expect(response.callbacks).to.be.a('object')
+          expect(response.callbacks.subscribe).to.be.a('function')
+
+          console.log(callbackId)
+          port.emitRequest(22, [callbackId])
+
+          return port.wait(10)
+        }).then(() => {
+          port.expectAck()
+          return Promise.all([
+            response.callbacks.toPromise(),
+            response.callbacks.pipe(count()).toPromise()
+          ])
+        }).then(callbackInfo => {
+          expect(callbackInfo[0]).to.deep.equal({ callback: 'bidiWithCallback22' })
+          expect(callbackInfo[1]).to.equal(1)
         })
       })
     })
@@ -275,7 +300,7 @@ describe('serialapispec', () => {
           expect(onApplicationControllerUpdate.calledOnce).to.be.true
           const request = onApplicationControllerUpdate.args[0][0]
           expect(request).to.be.deep.equal({ callback: 'callbackOnly41' })
-          expect(request.meta).to.be.deep.equal({ funcId: 41, data: [], callbackId: undefined })
+          expect(request.meta).to.be.deep.equal({ funcId: 41, data: [] })
         }).finally(() => {
           sub.unsubscribe()
         })

@@ -29,13 +29,14 @@ function standardEncodeRequestSpecs (funcMeta, scenarios) {
     if (scenarios.success) {
       for (const scenarioName of Object.keys(scenarios.success)) {
         const scenario = scenarios.success[scenarioName]
+
         it(`should encode frame request correctly in scenario '${scenarioName}'`, function () {
-          const actualResult = encodeRequest(scenario.request, scenario.callbackId)
-          const expectedMeta = {
-            funcId,
-            data: scenario.expected,
-            callbackId: scenario.callbackId
-          }
+          const callbackId = scenario.callbackId
+          const hasResponse = scenario.hasResponse || false
+          const data = scenario.expected
+          const actualResult = encodeRequest(scenario.request, { callbackId, hasResponse })
+          const expectedMeta = { funcId, data, callbackId, hasResponse }
+
           expect(actualResult).to.deep.equal(scenario.request)
           expect(actualResult.meta).to.deep.equal(expectedMeta)
         })
@@ -65,6 +66,7 @@ function standardDecodeResponseSpecs (funcMeta, scenarios) {
               funcId,
               data: [...dataFrame.params]
             }
+            if (typeof scenario.hasCallback !== 'undefined') expectedMeta.hasCallback = scenario.hasCallback
             expect(actualResult).to.deep.equal(scenario.expected)
             expect(actualResult.meta).to.deep.equal(expectedMeta)
           })
@@ -100,6 +102,7 @@ function standardDecodeResponseSpecs (funcMeta, scenarios) {
               funcId,
               data: [...dataFrame.params]
             }
+            if (typeof scenario.hasCallback !== 'undefined') expectedMeta.hasCallback = scenario.hasCallback
             expect(actualResult).to.deep.equal(scenario.expected)
             expect(actualResult.meta).to.deep.equal(expectedMeta)
           })
@@ -128,9 +131,9 @@ function standardDecodeCallbackSpecs (funcMeta, scenarios) {
             const actualResult = decodeCallback(dataFrame)
             const expectedMeta = {
               funcId,
-              data: [...dataFrame.params],
-              callbackId: scenario.callbackId
+              data: [...dataFrame.params]
             }
+            if (scenario.callbackId) expectedMeta.callbackId = scenario.callbackId
             expect(actualResult).to.deep.equal(scenario.expected)
             expect(actualResult.meta).to.deep.equal(expectedMeta)
           })
@@ -164,9 +167,9 @@ function standardDecodeCallbackSpecs (funcMeta, scenarios) {
             const actualResult = decodeCallback(dataFrame)
             const expectedMeta = {
               funcId,
-              data: [...dataFrame.params],
-              callbackId: scenario.callbackId
+              data: [...dataFrame.params]
             }
+            if (scenario.callbackId) expectedMeta.callbackId = scenario.callbackId
 
             expect(actualResult).to.deep.equal(scenario.expected)
             expect(actualResult.meta).to.deep.equal(expectedMeta)
