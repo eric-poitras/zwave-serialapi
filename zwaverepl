@@ -1,10 +1,12 @@
 #!/usr/bin/env node
-var SerialApi = require('./lib/serialapi')
+var SerialApi = require('./lib')
 var myrepl = require('repl').start()
 const api = SerialApi({
-  port: '/dev/ttyACM0'
+  port: '/dev/ttyACM1'
 })
-api.open()
+const sendData = require('./lib/serialapi/actions/send-data')
+const sendDataFunc = (command) => sendData(api, command)
 
 myrepl.context.SerialApi = SerialApi
 myrepl.context.api = api
+myrepl.context.sendData = sendDataFunc
