@@ -7,7 +7,7 @@ describe('createCallbackIdGenerator', function () {
     it('should not return 0 nor any value greater that 255', () => {
       const instance = sut()
       const last255Values = []
-      for (let i = 0; i < 1024; i++) {
+      for (let i = 0; i < 512; i++) {
         const res = instance.nextId()
         expect(res).to.be.greaterThan(0)
         expect(res).to.be.lessThan(256)

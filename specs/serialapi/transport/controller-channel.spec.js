@@ -4,6 +4,8 @@ const mockTime = require('../../tools/mock-time')
 const { controllerChannel } = require('../../../lib/serialapi/transport/controller-channel')
 const createMockSerialApi = require('../../tools/mock-serialapi')
 const sinon = require('sinon')
+const { of } = require('rxjs')
+const { delay } = require('rxjs/operators')
 
 describe('controllerChannel', () => {
   let clock
@@ -40,7 +42,7 @@ describe('controllerChannel', () => {
   }
 
   function waitForRetry (mockSerialApi, timeout) {
-    timeout = timeout || 1500
+    timeout = timeout || 500
     return wait(timeout).then(() => {
       expect(mockSerialApi.getRequestCount()).to.be.equal(0)
       return wait()
@@ -120,24 +122,41 @@ describe('controllerChannel', () => {
 
     it('should retry multiple time and eventually fail', () => {
       const command = { nodeId: 12, command: [0x10, 0x20] }
-      const onComplete = sinon.spy()
       const onError = sinon.spy()
-      sut.send(command).then(onComplete, onError)
+      sut.send(command).catch(onError)
 
       const tryOnce = () => {
-        try {
-          mockSerialApi.withNextRequest(req => {
-            expect(req.command).to.deep.equal(command)
-            req.response({ success: false })
-          })
-        } catch (e) {
-          console.log(e)
-        }
+        mockSerialApi.withNextRequest(req => {
+          expect(req.command).to.deep.equal(command)
+          req.response({ success: false })
+        })
         return waitForRetry(mockSerialApi)
       }
 
-      return wait().then(tryOnce).then(tryOnce).then(tryOnce).then(tryOnce).then(() => {
+      return wait().then(tryOnce).then(tryOnce).then(tryOnce).then(tryOnce).then(tryOnce).then(() => {
         expect(onError.calledOnce).to.be.true
+        expect(onError.args[0][0].message).to.be.equal('SendData returned false')
+        expect(mockSerialApi.api.sendDataAbort.called).to.be.false
+      })
+    })
+
+    it('should retry multiple time and eventually fail', () => {
+      const command = { nodeId: 12, command: [0x10, 0x20] }
+      const onError = sinon.spy()
+      sut.send(command).catch(onError)
+
+      const tryOnce = () => {
+        mockSerialApi.withNextRequest(req => {
+          expect(req.command).to.deep.equal(command)
+          req.response({ success: true }, of({ txStatus: 'OK' }).pipe(delay(70000)))
+        })
+        return waitForRetry(mockSerialApi, 65000)
+      }
+
+      return wait().then(tryOnce).then(() => {
+        expect(onError.calledOnce).to.be.true
+        expect(onError.args[0][0].message).to.be.equal('Timeout has occurred')
+        expect(mockSerialApi.api.sendDataAbort.called).to.be.true
       })
     })
   })
