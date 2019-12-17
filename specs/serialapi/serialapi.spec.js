@@ -3,6 +3,7 @@ const expect = require('chai').expect
 const mockTime = require('../tools/mock-time')
 const createMockSerialApiEnv = require('../tools/mock-serialapi-env')
 const sinon = require('sinon')
+const { isObservable } = require('rxjs')
 const { count } = require('rxjs/operators')
 
 describe('serialapispec', () => {
@@ -34,16 +35,23 @@ describe('serialapispec', () => {
       sut = null
     })
 
-    it('isOpen() should return false', () => {
-      expect(sut.isOpen.value).to.be.false
-    })
-
-    it('open() should open it', () => {
-      return sut.open().then(() => {
-        expect(sut.isOpen.value).to.be.true
-
-        // Serial Api should send a NAK on init
-        port.expectToReceive([0x15], 'Controller reset: Initial NAK')
+    describe('hmacIsOpen()', () => {
+      it('should be an observable', () => {
+        expect(isObservable(sut.hmacIsOpen)).to.be.true
+      })
+      it('should return false', () => {
+        expect(sut.hmacIsOpen.value).to.be.false
+      })
+      it('hmacOpen() should open it and hmacClose() should close it', () => {
+        return sut.hmacOpen().then(() => {
+          expect(sut.hmacIsOpen.value).to.be.true
+          // Serial Api should send a NAK on init
+          port.expectToReceive([0x15], 'Controller reset: Initial NAK')
+        }).then(() => sut.hmacClose()).then(() => {
+          expect(sut.hmacIsOpen.value).to.be.false
+          // Close does not send anything
+          port.expectNoMoreReceivedData()
+        })
       })
     })
 
@@ -74,7 +82,7 @@ describe('serialapispec', () => {
       env = createMockSerialApiEnv()
       port = env.port
       sut = env.serialApi
-      return sut.open().then(() => {
+      return sut.hmacOpen().then(() => {
         port.flushRecvData()
       })
     })
@@ -292,16 +300,24 @@ describe('serialapispec', () => {
 
     describe('inboundRequests', () => {
       it('should emit requests with decoded callback', () => {
-        const onApplicationControllerUpdate = sinon.mock()
-        const sub = sut.inboundRequests.subscribe(onApplicationControllerUpdate)
+        const subCallback1 = sinon.mock()
+        const subCallback2 = sinon.mock()
+        const sub1 = sut.inboundRequests.subscribe(subCallback1)
+        const sub2 = sut.callbackOnly41.subscribe(subCallback2)
 
-        return port.emitRequest(41).then(() => {
-          expect(onApplicationControllerUpdate.calledOnce).to.be.true
-          const request = onApplicationControllerUpdate.args[0][0]
+        function assertSubscriptionCallback (cb) {
+          expect(cb.calledOnce).to.be.true
+          const request = cb.args[0][0]
           expect(request).to.be.deep.equal({ callback: 'callbackOnly41' })
           expect(request.meta).to.be.deep.equal({ funcId: 41, data: [] })
+        }
+
+        return port.emitRequest(41).then(() => {
+          assertSubscriptionCallback(subCallback1)
+          assertSubscriptionCallback(subCallback2)
         }).finally(() => {
-          sub.unsubscribe()
+          sub1.unsubscribe()
+          sub2.unsubscribe()
         })
       })
     })
@@ -324,12 +340,12 @@ describe('serialapispec', () => {
       })
     })
 
-    describe('close()', () => {
-      it('should close the serialapi', () => {
-        expect(sut.isOpen.value).to.be.true
+    describe('dispose()', () => {
+      it('should dispose the serialapi', () => {
+        expect(sut.hmacIsOpen.value).to.be.true
         expect(port.api.close.calledOnce).to.be.false
-        return sut.close().then(() => {
-          expect(sut.isOpen.value).to.be.false
+        return sut.dispose().then(() => {
+          expect(sut.hmacIsOpen.value).to.be.false
           expect(port.api.close.calledOnce).to.be.true
         })
       })

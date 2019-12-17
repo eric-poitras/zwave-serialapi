@@ -4,8 +4,8 @@ const mockTime = require('../../tools/mock-time')
 const { controllerChannel } = require('../../../lib/serialapi/transport/controller-channel')
 const createMockSerialApi = require('../../tools/mock-serialapi')
 const sinon = require('sinon')
-const { of } = require('rxjs')
-const { delay } = require('rxjs/operators')
+const { of, isObservable } = require('rxjs')
+const { delay, take } = require('rxjs/operators')
 
 describe('controllerChannel', () => {
   let clock
@@ -32,8 +32,7 @@ describe('controllerChannel', () => {
 
   it('should be a channel', () => {
     expect(sut.send).to.be.a('function')
-    expect(sut.events).to.be.a('object')
-    expect(sut.events.subscribe).to.be.a('function')
+    expect(isObservable(sut.requests)).to.be.true
   })
 
   function wait (timeout) {
@@ -158,6 +157,31 @@ describe('controllerChannel', () => {
         expect(onError.args[0][0].message).to.be.equal('Timeout has occurred')
         expect(mockSerialApi.api.sendDataAbort.called).to.be.true
       })
+    })
+  })
+
+  describe('requests', () => {
+    it('should be an observable', () => {
+      expect(isObservable(sut.requests)).to.be.true
+    })
+
+    it('should emit received requests', () => {
+      const request = {
+        nodeId: 12,
+        command: []
+      }
+      mockSerialApi.api.applicationCommandHandler.next(request)
+      sut.requests.pipe(take(1)).toPromise().then(res => {
+        expect(res).to.deep.equal(request)
+      })
+    })
+  })
+
+  describe('dispose', () => {
+    it('should release all subscriptions', () => {
+      expect(mockSerialApi.api.applicationCommandHandler.observers.length).to.be.equal(1)
+      sut.dispose()
+      expect(mockSerialApi.api.applicationCommandHandler.observers.length).to.be.equal(0)
     })
   })
 })

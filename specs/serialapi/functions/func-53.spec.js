@@ -8,7 +8,7 @@ standardEncodeRequestSpecs(sut, {
     Simple: {
       request: {},
       callbackId: 0xaa,
-      expected: []
+      expected: [0xaa]
     }
   }
 })

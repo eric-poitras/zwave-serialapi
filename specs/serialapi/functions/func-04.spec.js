@@ -15,7 +15,7 @@ standardDecodeCallbackSpecs(sut, {
           foreignHome: false,
           frameType: 'SINGLE'
         },
-        sourceNodeId: 0x03,
+        nodeId: 0x03,
         command: [0x20, 0x03, 0xff]
       }
     },
@@ -29,7 +29,7 @@ standardDecodeCallbackSpecs(sut, {
           foreignHome: false,
           frameType: 'BROADCAST'
         },
-        sourceNodeId: 0x87,
+        nodeId: 0x87,
         command: [0x20, 0x01, 0x02]
       }
     },
@@ -43,7 +43,7 @@ standardDecodeCallbackSpecs(sut, {
           foreignHome: false,
           frameType: 'MULTICAST'
         },
-        sourceNodeId: 0x01,
+        nodeId: 0x01,
         command: [0x20, 0x01]
       }
     },
@@ -57,7 +57,7 @@ standardDecodeCallbackSpecs(sut, {
           foreignHome: false,
           frameType: 'EXPLORE'
         },
-        sourceNodeId: 0x01,
+        nodeId: 0x01,
         command: []
       }
     }

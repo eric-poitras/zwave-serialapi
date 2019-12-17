@@ -28,7 +28,8 @@ function createMockSerialApi () {
     getRequestCount: () => pendingSendData.length,
     api: {
       sendData: sinon.spy(sendData),
-      sendDataAbort: sinon.spy(sendDataAbort)
+      sendDataAbort: sinon.spy(sendDataAbort),
+      applicationCommandHandler: new Subject()
     }
   }
 }

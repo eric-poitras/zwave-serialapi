@@ -4,9 +4,8 @@ var myrepl = require('repl').start()
 const api = SerialApi({
   port: '/dev/ttyACM1'
 })
-const sendData = require('./lib/serialapi/transport/controller-channel')
-const sendDataFunc = (command) => sendData(api, command)
+const channel = require('./lib/serialapi/transport/controller-channel').controllerChannel(api)
 
 myrepl.context.SerialApi = SerialApi
 myrepl.context.api = api
-myrepl.context.sendData = sendDataFunc
+myrepl.context.channel = channel
