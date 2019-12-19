@@ -41,7 +41,7 @@ function buildTestFunction (name, funcId, opts) {
 function setupMockedSerialApi () {
   const createMockPort = require('./mock-port')
   const port = createMockPort('/dev/ttyMock1')
-  const hmac = proxyquire('../../lib/serialapi/port', {
+  const hmac = proxyquire('../../lib/serialapi/hmac', {
     serialport: port.api.constructor,
     '@global': true
   })
@@ -60,7 +60,7 @@ function setupMockedSerialApi () {
   definitions.forEach(d => { definitionsByName[d.name] = d })
 
   const serialApi = proxyquire('../../lib/serialapi/serialapi', {
-    './port': hmac,
+    './hmac': hmac,
     './functions': definitions
   }).serialApi({
     port: port.name

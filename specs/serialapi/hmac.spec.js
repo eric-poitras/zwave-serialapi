@@ -7,7 +7,7 @@ const mockTime = require('../tools/mock-time')
 
 function shouldNotHappens () { sinon.assert.fail('This should not happens') }
 
-describe('zwave port', function () {
+describe('hmac', function () {
   let clock
   let MockPort
 
@@ -27,7 +27,7 @@ describe('zwave port', function () {
     let sut
     beforeEach(function () {
       port = MockPort('/dev/ttyMock1')
-      sut = proxyquire('../../lib/serialapi/port', {
+      sut = proxyquire('../../lib/serialapi/hmac', {
         serialport: port.api.constructor,
         '@global': true
       })
@@ -57,7 +57,7 @@ describe('zwave port', function () {
 
     beforeEach(function () {
       port = MockPort('/dev/ttyMock1')
-      sut = proxyquire('../../lib/serialapi/port', {
+      sut = proxyquire('../../lib/serialapi/hmac', {
         serialport: port.api.constructor
       })({
         port: port.name
@@ -146,7 +146,7 @@ describe('zwave port', function () {
 
     beforeEach(function () {
       port = MockPort('/dev/ttyMock1')
-      sut = proxyquire('../../lib/serialapi/port', {
+      sut = proxyquire('../../lib/serialapi/hmac', {
         serialport: port.api.constructor
       })({
         port: port.name

@@ -272,7 +272,7 @@ describe('serialapispec', () => {
         }).then(() => {
           port.expectAck()
 
-          expect(fun.decodeResponse.calledOnce).to.be.true
+          expect(fun.decodeResponse.called).to.be.true
           expect(fun.decodeResponse.args[0][0]).to.be.deep.equal({ type: 1, funcId: 22, params: Buffer.alloc(0) })
           expect(onError.called).to.be.false
           expect(onComplete.calledOnce).to.be.true
